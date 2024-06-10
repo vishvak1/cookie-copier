@@ -1,0 +1,52 @@
+body {
+  border-radius: 5px;
+}
+
+#root {
+  min-width: 400px;
+  min-height: 350px;
+  width: min-content;
+  height: min-content;
+  background-color: black;
+}
+
+.inputField {
+  width: 250px;
+  margin: 0 15px 0 15px;
+}
+
+.listField {
+  min-width: 250px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.listItem {
+  border: 1px solid #fff;
+}
+
+.minimalistic-select {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f5f5f5;
+  min-width: 250px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.minimalistic-select::-webkit-scrollbar {
+  width: 8px;
+}
+
+.minimalistic-select::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+.addCta {
+  margin: 20px 0 30px 0;
+}
+
+.headerContent {
+  align-content: center;
+}
