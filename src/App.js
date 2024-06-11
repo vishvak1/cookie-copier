@@ -10,7 +10,8 @@ import AddCookie from "./modules/AddCookie";
 function App() {
   const [activeKey, setActiveKey] = useState("pairListing");
   const [tabs, setTabs] = useState([]);
-  const [pairedTabs, setPairedTabs] = useState([]);
+  const [currentSessionPairs, setCurrentSessionPairs] = useState([]);
+  const [savedPairs, setSavedPairs] = useState([]);
 
   const content = {
     tabHeadings: {
@@ -37,10 +38,28 @@ function App() {
 
   // Fetch paired tabs from storage on component mount
   useEffect(() => {
-    chrome.storage.local.get("pairedTabs", (data) => {
-      setPairedTabs(data.pairedTabs || []);
+    chrome.storage.local.get("savedPairs", (data) => {
+      setSavedPairs(data.savedPairs || []);
     });
-  }, []);
+  }, [savedPairs, setSavedPairs]);
+
+  // Fetch the current session paired tabs in chrome runtime to avoid persistence after closing current session
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.type === "getCurrentSessionPairs") {
+        sendResponse({ pairs: currentSessionPairs });
+      }
+    });
+
+    return () => {
+      chrome.runtime.onMessage.removeListener();
+    };
+  }, [currentSessionPairs]);
+
+  const updateCurrentSessionPairs = (pairs) => {
+    setCurrentSessionPairs(pairs);
+    chrome.runtime.sendMessage({ type: "updateCurrentSessionPairs", pairs });
+  };
 
   return (
     <div>
@@ -62,10 +81,12 @@ function App() {
         </Nav>
         <Tab.Content>
           <Tab.Pane eventKey="pairListing">
-            <TabPairs pairedTabs={pairedTabs} />
+            <TabPairs currentSessionPairs={currentSessionPairs} savedPairs={savedPairs} />
           </Tab.Pane>
           <Tab.Pane eventKey="addCookie">
-            <AddCookie tabs={tabs} />
+            <AddCookie tabs={tabs}
+              currentSessionPairs={currentSessionPairs}
+              updateCurrentSessionPairs={updateCurrentSessionPairs} />
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>

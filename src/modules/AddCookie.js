@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import CookieSelection from "./CookieSelection";
 
-function AddCookie({ tabs }) {
+function AddCookie({ tabs, currentSessionPairs,updateCurrentSessionPairs }) {
   const [selectedFromTab, setSelectedFromTab] = useState(null);
   const [selectedToTab, setSelectedToTab] = useState(null);
   const [showCookieSelection, setShowCookieSelection] = useState(false);
@@ -69,6 +69,8 @@ function AddCookie({ tabs }) {
         <CookieSelection
           selectedFromTab={selectedFromTab}
           selectedToTab={selectedToTab}
+          currentSessionPairs={currentSessionPairs}
+          updateCurrentSessionPairs={updateCurrentSessionPairs}
         />
       )}
     </div>

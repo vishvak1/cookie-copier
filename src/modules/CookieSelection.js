@@ -3,7 +3,7 @@ import { Form, Button, ListGroup } from "react-bootstrap";
 
 /* global chrome */
 
-function CookieSelection({ selectedFromTab, selectedToTab }) {
+function CookieSelection({ selectedFromTab, selectedToTab, currentSessionPairs, updateCurrentSessionPairs }) {
   const [cookies, setCookies] = useState([]);
   const [selectedCookies, setSelectedCookies] = useState([]);
 
@@ -55,6 +55,9 @@ function CookieSelection({ selectedFromTab, selectedToTab }) {
           value: cookie.value,
           domain: domain,
           path: cookie.path,
+          expirationDate: cookie.expirationDate,
+          secure: cookie.secure,
+          httpOnly: cookie.httpOnly,
         });
       });
     });
@@ -63,6 +66,15 @@ function CookieSelection({ selectedFromTab, selectedToTab }) {
   // Handle clicking the "Copy cookies" button
   const handleCopyCookies = () => {
     copyCookies();
+
+    const listItem = {
+      fromTab: selectedFromTab,
+      toTab: selectedToTab,
+      cookies: selectedCookies,
+    };
+
+    // Update current session pairs
+    updateCurrentSessionPairs([...currentSessionPairs, listItem]);
   };
 
   // Handle clicking the "Copy and save cookies" button
@@ -75,14 +87,14 @@ function CookieSelection({ selectedFromTab, selectedToTab }) {
         cookies: selectedCookies,
         configName: configName,
       };
-      chrome.storage.local.get("pairedTabs", (data) => {
-        let pairedTabs = data.pairedTabs;
-        if (pairedTabs) {
-          pairedTabs.push(listItem);
+      chrome.storage.local.get("savedPairs", (data) => {
+        let savedPairs = data.savedPairs;
+        if (savedPairs) {
+          savedPairs.push(listItem);
         } else {
-          pairedTabs = [listItem];
+          savedPairs = [listItem];
         }
-        chrome.storage.local.set({ pairedTabs });
+        chrome.storage.local.set({ savedPairs });
       });
       copyCookies();
     }
@@ -102,7 +114,7 @@ function CookieSelection({ selectedFromTab, selectedToTab }) {
           ))}
         </Form.Select>
         <br />
-        <h5>{content?.selectedCookiesHeading}</h5>
+        <h5 className="text-white">{content?.selectedCookiesHeading}</h5>
         <ListGroup className="justify-content-center listField">
           {selectedCookies.map((cookie, index) => (
             <ListGroup.Item className="bg-dark text-white listItem" key={index}>
